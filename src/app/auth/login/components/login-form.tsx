@@ -10,9 +10,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -29,6 +30,7 @@ const formSchema = z.object({
 
 export const LoginForm = () => {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -39,8 +41,24 @@ export const LoginForm = () => {
 
   const onSubmit = useCallback(
     async (values: z.infer<typeof formSchema>) => {
-      await signIn("credentials", values);
-      router.push("/");
+      try {
+        setIsLoading(true);
+        const res = await signIn("credentials", {
+          redirect: false,
+          ...values,
+        });
+
+        if (res?.error) {
+          return form.setError("password", {
+            message: "Wrong email or password",
+          });
+        }
+
+        router.push("/ac");
+        form.reset();
+      } finally {
+        setIsLoading(false);
+      }
     },
     [router],
   );
@@ -72,7 +90,10 @@ export const LoginForm = () => {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading && <Loader2 className="animate-spin" />}
+          Submit
+        </Button>
       </form>
     </Form>
   );
