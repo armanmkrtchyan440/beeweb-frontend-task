@@ -57,16 +57,16 @@ export const WorkspaceModal: FC<WorkspaceModalProps> = ({
 
   // Debounced function to check slug
   const debouncedCheckSlug = useCallback(
-    (slug: string) =>
-      debounce(async () => {
-        const data = await checkWorkspaceSlug(slug);
+    debounce(async (slug: string) => {
+      console.log("Debounced check slug:", slug);
+      const data = await checkWorkspaceSlug(slug);
 
-        if (!data.available && data.suggestion) {
-          form.setValue("slug", data.suggestion);
-        } else {
-          form.setValue("slug", slug);
-        }
-      }, 500),
+      if (!data.available && data.suggestion) {
+        form.setValue("slug", data.suggestion);
+      } else {
+        form.setValue("slug", slug);
+      }
+    }, 500),
     [form],
   );
 
