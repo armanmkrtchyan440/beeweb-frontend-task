@@ -95,6 +95,7 @@ class FetchClient {
           ...headers,
         },
         body: body ? (isFormData ? body : JSON.stringify(body)) : null,
+        next: { revalidate: 0 },
       });
 
       data = await response.json();
