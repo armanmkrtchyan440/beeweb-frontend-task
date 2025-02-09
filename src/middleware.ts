@@ -3,9 +3,9 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 export async function middleware(req: NextRequest) {
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const { pathname } = req.nextUrl;
-
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  console.log("token:", token);
   if (pathname.startsWith("/ac") && !token) {
     return NextResponse.redirect(new URL("/auth/login", req.url));
   }
